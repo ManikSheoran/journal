@@ -2,32 +2,24 @@ const mongoose = require('mongoose');
 const passportLocalMongoose = require('passport-local-mongoose');
 
 const JournalSchema = new mongoose.Schema({
-    title: {
+    _id: {
         type: String,
-        required: true,
-        trim: true
+        required: true
     },
     content: {
         type: String,
         required: true,
         trim: true
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
     mood: {
-        type: String,
-        enum: ['happy', 'sad', 'neutral', 'angry', 'anxious'],
-        default: 'neutral'
-    },
-    streaks: {
         type: Number,
-        default: 0
+        required: true,
+        min: 1,
+        max: 5
     },
-    date: {
-        type: String,
-        required: true
+    todos: {
+        type: [String],
+        default: []
     }
 });
 
