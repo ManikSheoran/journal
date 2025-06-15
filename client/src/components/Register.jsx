@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function Login() {
+function Register() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    password: ""
+  });
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
@@ -14,7 +18,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:3000/api/users/login", {
+      const res = await fetch("http://localhost:3000/api/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -24,9 +28,9 @@ function Login() {
       const data = await res.json();
 
       if (res.ok) {
-        navigate("/"); // Redirect to home (Calendar)
+        navigate("/"); // Redirect to home
       } else {
-        setError(data.message || "Login failed");
+        setError(data.message || "Registration failed");
       }
     } catch (err) {
       setError("Network error. Try again.");
@@ -35,9 +39,17 @@ function Login() {
 
   return (
     <div>
-      <h2>Login</h2>
+      <h2>Register</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          value={form.username}
+          onChange={handleChange}
+          required
+        /><br />
         <input
           type="email"
           name="email"
@@ -54,10 +66,10 @@ function Login() {
           onChange={handleChange}
           required
         /><br />
-        <button type="submit">Login</button>
+        <button type="submit">Register</button>
       </form>
     </div>
   );
 }
 
-export default Login;
+export default Register;
