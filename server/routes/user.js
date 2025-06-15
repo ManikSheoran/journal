@@ -12,9 +12,7 @@ router.get('/profile', (req, res) => {
             message: 'User profile retrieved successfully'
         });
     } else {
-        res.status(401).json({
-            message: 'Unauthorized access'
-        });
+        res.status(401).json({ message: 'Unauthorized access' });
     }
 });
 
@@ -25,15 +23,9 @@ router.post('/register', async (req, res) => {
     try {
         const user = new User({ username, email });
         const registeredUser = await User.register(user, password);
-        res.status(201).json({
-            user: registeredUser,
-            message: 'Registration successful'
-        });
+        res.status(201).json({ user: registeredUser, message: 'Registration successful' });
     } catch (err) {
-        res.status(400).json({
-            message: 'Registration failed',
-            error: err.message
-        });
+        res.status(400).json({ message: 'Registration failed', error: err.message });
     }
 });
 
@@ -46,10 +38,7 @@ router.post('/login', (req, res, next) => {
         }
         req.logIn(user, (err) => {
             if (err) return next(err);
-            return res.status(200).json({
-                user: req.user,
-                message: 'Login successful'
-            });
+            return res.status(200).json({ user: req.user, message: 'Login successful' });
         });
     })(req, res, next);
 });
@@ -64,56 +53,103 @@ router.post('/logout', (req, res) => {
     });
 });
 
-// GET a journal by date
+
+// POST: Add a new journal
+router.post('/journal', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: 'Unauthorized access' });
+    }
+
+    const { _id, content, mood, todos } = req.body;
+
+    if (!_id || !content || typeof mood !== 'number') {
+        return res.status(400).json({ message: 'Missing required journal fields' });
+    }
+
+    try {
+        req.user.journals.push({ _id, content, mood, todos });
+        await req.user.save();
+        res.status(201).json({ message: 'Journal entry added successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to add journal entry', error: err.message });
+    }
+});
+
+
+// GET: Retrieve a journal by ?q=<id>
 router.get('/journal', (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ message: 'Unauthorized access' });
     }
 
-    const queryDate = req.query.q; 
-    const journal = req.user.journals.find(j => j.date === queryDate);
+    const { q } = req.query;
+
+    if (!q) return res.status(400).json({ message: 'Missing journal ID' });
+
+    const journal = req.user.journals.find(j => j._id === q);
 
     if (!journal) {
-        return res.status(404).json({ message: 'Journal entry not found for this date' });
+        return res.status(404).json({ message: 'Journal entry not found' });
     }
 
-    res.status(200).json({
-        journal,
-        message: 'Journal entry retrieved successfully'
-    });
+    res.status(200).json({ journal, message: 'Journal entry retrieved successfully' });
 });
 
-// PUT to update a journal by date
+
 router.put('/journal', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ message: 'Unauthorized access' });
     }
 
-    const queryDate = req.query.q;
-    const { title, content, mood, streaks } = req.body;
-    const user = req.user;
+    const { q } = req.query;
+    if (!q) return res.status(400).json({ message: 'Missing journal ID in query param' });
 
-    const journal = user.journals.find(j => j.date === queryDate);
+    const { content, mood, todos } = req.body;
 
-    if (!journal) {
-        return res.status(404).json({ message: 'Journal entry not found to update' });
+    let journal = req.user.journals.find(j => j._id === q);
+
+    if (journal) {
+        if (content !== undefined) journal.content = content;
+        if (typeof mood === 'number') journal.mood = mood;
+        if (Array.isArray(todos)) journal.todos = todos;
+    } else {
+        journal = { _id: q, content: content || "", mood: mood || 3, todos: Array.isArray(todos) ? todos : [] };
+        req.user.journals.push(journal);
     }
-
-    // Update fields if provided
-    if (title) journal.title = title;
-    if (content) journal.content = content;
-    if (mood) journal.mood = mood;
-    if (typeof streaks === 'number') journal.streaks = streaks;
 
     try {
-        await user.save();
-        res.status(200).json({
-            message: 'Journal updated successfully',
-            journal
-        });
+        await req.user.save();
+        res.status(200).json({ message: 'Journal saved successfully', journal });
     } catch (err) {
-        res.status(500).json({ message: 'Failed to update journal', error: err.message });
+        res.status(500).json({ message: 'Failed to save journal', error: err.message });
     }
 });
+
+
+// DELETE: Delete a journal by ?q=<id>
+router.delete('/journal', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: 'Unauthorized access' });
+    }
+
+    const { q } = req.query;
+    if (!q) return res.status(400).json({ message: 'Missing journal ID in query param' });
+
+    const index = req.user.journals.findIndex(j => j._id === q);
+
+    if (index === -1) {
+        return res.status(404).json({ message: 'Journal entry not found' });
+    }
+
+    req.user.journals.splice(index, 1);
+
+    try {
+        await req.user.save();
+        res.status(200).json({ message: 'Journal deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to delete journal', error: err.message });
+    }
+});
+
 
 module.exports = router;
