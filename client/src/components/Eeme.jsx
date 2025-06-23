@@ -27,14 +27,12 @@ const Eeme = ({ date }) => {
     setShowSuggestions(false);
 
     try {
-      const res = await fetch(
-        `http://localhost:3000/api/ai?date=${encodeURIComponent(date)}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: input }),
-        }
-      );
+      const res = await fetch("http://localhost:3000/api/ai", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date, prompt: input }),
+      });
       const data = await res.json();
       setMessages((prev) => [
         ...prev,
@@ -79,11 +77,6 @@ const Eeme = ({ date }) => {
           </div>
         </>
       )}
-
-      {/* Main content */}
-      <h2 className="text-3xl font-semibold text-[#03A6A1] mb-4 text-center">
-        Eeme AI Assistant
-      </h2>
       <div
         className="flex-1 w-full overflow-y-scroll mb-4 bg-gray-50 rounded p-3 scrollbar-thin scrollbar-thumb-[#03A6A1]/30 scrollbar-track-gray-100"
         style={{ maxHeight: "350px" }}
@@ -101,8 +94,11 @@ const Eeme = ({ date }) => {
                   ? "bg-[#03A6A1] text-white"
                   : "bg-gray-200 text-gray-800"
               }`}
+              {...(msg.from === "ai"
+                ? { dangerouslySetInnerHTML: { __html: msg.text } }
+                : {})}
             >
-              {msg.text}
+              {msg.from === "user" ? msg.text : null}
             </div>
           </div>
         ))}

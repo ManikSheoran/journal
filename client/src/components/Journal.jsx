@@ -151,10 +151,10 @@ function Journal() {
       <button
         className="fixed bottom-6 right-6 z-50 bg-[#03A6A1] text-white rounded-full shadow-lg p-4 sm:hidden flex items-center justify-center"
         onClick={() => setShowEeme(true)}
-        aria-label="Open Gemini AI Assistant"
+        aria-label="Open AI Assistant"
       >
         <span role="img" aria-label="ai" className="text-2xl">
-          🤖
+          Talk to Eeme
         </span>
       </button>
 
@@ -175,12 +175,12 @@ function Journal() {
         >
           <div className="flex justify-between items-center p-4 border-b border-gray-100">
             <h3 className="text-xl font-semibold text-[#03A6A1]">
-              Gemini AI Assistant
+              Eeme AI Assistant
             </h3>
             <button
               className="text-gray-400 hover:text-gray-700 text-2xl"
               onClick={() => setShowEeme(false)}
-              aria-label="Close Gemini AI Assistant"
+              aria-label="Close AI Assistant"
             >
               &times;
             </button>

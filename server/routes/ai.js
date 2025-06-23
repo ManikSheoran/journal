@@ -1,11 +1,14 @@
 const express = require('express');
 const passport = require('passport');
 const User = require('../models/user');
-const { GoogleGenAI } = require('@google/genai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const process = require('process');
+require('dotenv').config();
+const {marked} = require('marked'); 
 
 const router = express.Router();
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY );
 
 router.post('/', async (req, res) => {
     if (!req.isAuthenticated()) {
@@ -47,19 +50,43 @@ router.post('/', async (req, res) => {
         });
 
         const systemPrompt = `
-You are a helpful journaling assistant. Here is the user's last 7 days of journal entries:
-${historyText || 'No entries for the last 7 days.'}
-Latest date is current date.
-User's question: ${prompt}
-Respond in a friendly, concise, and helpful way.
-        `;
+You are a warm, emotionally intelligent journaling companion. The user has been journaling regularly over the past week. Here are their entries:
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: systemPrompt,
-        });
+${historyText || 'No entries for the past week.'}
 
-        res.json({ response: response.text });
+The mood scale ranges from 1 to 5, where:
+1 = very low
+2 = low
+3 = neutral
+4 = good
+5 = very good
+
+Your job is to thoughtfully reflect on their recent patterns and provide a supportive, friendly, and helpful response to their current prompt.
+
+- responds focuses on the user's emotional state and recent patterns
+- avoid a long hello paragraph or analysis in every response
+
+Avoid directly stating mood numbers or specific dates like DDMMYYYY. Instead:
+- format dates in months like "January 1st", "February 14th", etc.
+- Use natural phrases like "today", "yesterday", "tomorrow", "a few days ago", "recently", "over the past week", etc.
+- Use emotional tone words like “happy”, “a bit off”, “feeling low”, “energized”, “calm”, etc.
+
+Speak like a caring friend who genuinely wants to help. If appropriate, offer gentle suggestions, encouragement, or insights based on their recent entries. Keep the tone light, friendly, and human.
+
+Here’s the user’s current question or thought:
+"${prompt}"
+`;
+
+
+        // Use the correct API for @google/generative-ai
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const result = await model.generateContent(systemPrompt);
+
+        let aiResponse = result?.response?.text() || "Sorry, I couldn't generate a response.";
+        aiResponse = aiResponse.trim().replace(/\n{3,}/g, '\n\n');
+        
+        const htmlResponse = marked(aiResponse);
+        res.json({ response: htmlResponse });
     } catch (err) {
         console.error('Gemini AI error:', err);
         res.status(500).json({ message: 'AI error', error: err.message });
