@@ -6,17 +6,17 @@
   font-weight: 400;
 
   color: #213547;
-  background-color: #FFE3BB;
+  background-color: #ffe3bb;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --primary: #03A6A1;
-  --cream: #FFE3BB;
-  --peach: #FFA673;
-  --orange: #FF4F0F;
+  --primary: #03a6a1;
+  --cream: #ffe3bb;
+  --peach: #ffa673;
+  --orange: #ff4f0f;
 }
 
 a {
@@ -40,7 +40,17 @@ body {
   color: #213547;
 }
 
-h1, h2, h3, h4, h5, h6 {
+html,
+body {
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--primary);
   font-weight: 700;
   margin: 0.5em 0;
@@ -83,4 +93,30 @@ button:focus-visible {
   button {
     background-color: var(--primary);
   }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  background: #ffe3bb;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #ffa673 60%, #ffa673 100%);
+  border-radius: 6px;
+  min-height: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #ffa673 60%, #ffd6a0 100%);
+}
+
+::-webkit-scrollbar-corner {
+  background: #ffe3bb;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #ffa673 #ffe3bb;
 }

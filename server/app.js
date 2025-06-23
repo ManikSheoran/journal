@@ -9,6 +9,7 @@ const passport = require('./config/passport.js');
 const mongoose = require('mongoose');
 
 const userRoutes = require('./routes/user');
+const aiRoutes = require('./routes/ai');
 
 dotenv.config({ path: './.env' });
 
@@ -61,6 +62,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/users', userRoutes);
+app.use('/api/ai', aiRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
