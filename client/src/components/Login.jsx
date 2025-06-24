@@ -116,6 +116,15 @@ function Login() {
               Sign up here ✨
             </a>
           </p>
+          <p className="mt-2 text-center text-xs text-gray-500">
+            Forgot your password?{" "}
+            <a
+              href="mailto:superteenm@gmail.com"
+              className="font-medium text-[color:var(--primary)] hover:text-opacity-80 hover:underline"
+            >
+              Contact us
+            </a>
+          </p>
         </div>
       </div>
     </div>

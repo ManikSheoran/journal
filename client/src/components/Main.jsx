@@ -66,6 +66,7 @@ const Main = () => {
   );
 };
 
+// eslint-disable-next-line react/prop-types
 const Feature = ({ icon, title, description }) => (
   <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-[#F1F1F1] flex flex-col items-start gap-3">
     <div className="text-4xl">{icon}</div>
