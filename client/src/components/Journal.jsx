@@ -144,7 +144,7 @@ function Journal() {
         <span role="img" aria-label="journal" className="mr-2">
           📝
         </span>{" "}
-        Journal Entry for {formatted_date}
+        Journal Entry - {formatted_date}
       </h2>
 
       {/* Mobile Eeme toggle button */}
@@ -154,7 +154,7 @@ function Journal() {
         aria-label="Open AI Assistant"
       >
         <span role="img" aria-label="ai" className="text-2xl">
-          Talk to Eeme
+          🤖
         </span>
       </button>
 

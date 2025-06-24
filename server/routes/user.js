@@ -2,7 +2,31 @@ const express = require('express');
 const passport = require('passport');
 const User = require('../models/user');
 
+const crypto = require('crypto');
+const process = require('process');
 const router = express.Router();
+
+const ENCRYPTION_KEY = process.env.JOURNAL_SECRET_KEY;
+const IV_LENGTH = 16;
+
+function encrypt(text) {
+    if (typeof text !== 'string') text = String(text ?? '');
+    const iv = crypto.randomBytes(IV_LENGTH);
+    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    return iv.toString('hex') + ':' + encrypted;
+}
+
+function decrypt(text) {
+    if (!text || typeof text !== 'string' || !text.includes(':')) return text || '';
+    const [ivHex, encrypted] = text.split(':');
+    const iv = Buffer.from(ivHex, 'hex');
+    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+}
 
 // Get authenticated user's profile
 router.get('/profile', (req, res) => {
