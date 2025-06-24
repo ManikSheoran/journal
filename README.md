@@ -1,4 +1,4 @@
-# Journal
+# Journee
 
 A secure, AI-powered journaling web app with mood tracking, todos, and Gemini AI assistant.
 
@@ -32,8 +32,8 @@ A secure, AI-powered journaling web app with mood tracking, todos, and Gemini AI
 1. **Clone the repo:**
 
    ```sh
-   git clone https://github.com/yourusername/journal.git
-   cd journal
+   git clone https://github.com/ManikSheoran/Journee.git
+   cd Journee
    ```
 
 2. **Install dependencies:**
