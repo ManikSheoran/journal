@@ -1,13 +1,14 @@
 const crypto = require('crypto');
 require('dotenv').config();
+const process = require('process');
 
 const ENCRYPTION_KEY = process.env.JOURNAL_SECRET_KEY;
-
+console.log('ENCRYPTION_KEY:', ENCRYPTION_KEY);
 if (!ENCRYPTION_KEY || Buffer.from(ENCRYPTION_KEY, 'utf-8').length !== 32) {
     throw new Error('JOURNAL_SECRET_KEY environment variable must be a 32-byte key.');
 }
 
-const IV_LENGTH = 16; // For AES, this is always 16
+const IV_LENGTH = 16;
 
 function encrypt(text) {
     if (typeof text !== 'string') text = String(text ?? '');

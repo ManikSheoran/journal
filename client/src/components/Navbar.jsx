@@ -68,7 +68,7 @@ const Navbar = () => {
               </span>
               <button
                 onClick={handleCalendarClick}
-                className="bg-white border border-gray-300 rounded-full px-3 py-1 shadow hover:bg-gray-100 transition text-[#03A6A1] font-semibold flex items-center text-sm"
+                className="bg-white border border-gray-300 rounded-full px-3 py-1.5 shadow hover:bg-gray-100 transition text-[#03A6A1] font-semibold flex items-center text-sm min-w-[100px] justify-center"
                 style={{ marginLeft: 8 }}
               >
                 <span role="img" aria-label="calendar" className="mr-1 text-lg">
@@ -78,8 +78,10 @@ const Navbar = () => {
               </button>
               <button
                 onClick={handleLogout}
-                className="bg-[color:var(--orange)] hover:bg-[color:var(--peach)] text-white font-semibold py-1.5 px-3 sm:py-2 sm:px-4 rounded-lg text-xs sm:text-sm transition"
-              >
+                className="bg-white border border-gray-300 rounded-full px-3 py-1.5 shadow hover:bg-gray-100 transition text-[#03A6A1] font-semibold flex items-center text-sm min-w-[100px] justify-center"
+              ><span role="img" aria-label="calendar" className="mr-1 text-lg">
+                  🚪
+                </span>
                 Logout
               </button>
             </>
