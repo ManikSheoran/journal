@@ -1,6 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const User = require('../models/user');
+const { decrypt } = require('../utils/crypto');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const process = require('process');
 require('dotenv').config();
@@ -46,7 +47,8 @@ router.post('/', async (req, res) => {
 
         let historyText = '';
         last7Journals.forEach(j => {
-            historyText += `Date: ${j._id}, Mood: ${j.mood}, Todos: ${j.todos?.join(', ') || 'None'}, Content: ${j.content}\n`;
+            const decryptedContent = decrypt(j.content);
+            historyText += `Date: ${j._id}, Mood: ${j.mood}, Todos: ${j.todos?.join(', ') || 'None'}, Content: ${decryptedContent}\n`;
         });
 
         const systemPrompt = `

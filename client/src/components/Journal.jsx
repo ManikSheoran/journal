@@ -74,6 +74,8 @@ function Journal() {
         setJournal(data.journal);
         setIsEditing(false);
         setError(null);
+        // Refresh the page after save
+        window.location.reload();
       })
       .catch((err) => {
         alert("Failed to update journal: " + err.message);
@@ -262,7 +264,7 @@ function Journal() {
             ) : (
               <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 h-full flex flex-col items-center justify-center text-center space-y-6">
                 <span role="img" aria-label="empty page" className="text-6xl">
-                  🌬️
+                  🙃
                 </span>
                 <p className="text-xl text-gray-600">
                   Looks like this page is empty.

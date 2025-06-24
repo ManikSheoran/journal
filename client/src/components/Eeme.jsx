@@ -2,8 +2,7 @@ import { useState } from "react";
 
 const samplePrompts = [
   "Analyze my day",
-  "How was my mood last 7 days?",
-  "Summarize my journal",
+  "How was my mood last week?",
   "Suggest habits for better mood",
 ];
 
@@ -94,11 +93,13 @@ const Eeme = ({ date }) => {
                   ? "bg-[#03A6A1] text-white"
                   : "bg-gray-200 text-gray-800"
               }`}
-              {...(msg.from === "ai"
+              {...(msg.from === "ai" && /<\/?[a-z][\s\S]*>/i.test(msg.text)
                 ? { dangerouslySetInnerHTML: { __html: msg.text } }
                 : {})}
             >
-              {msg.from === "user" ? msg.text : null}
+              {msg.from === "user" || !/<\/?[a-z][\s\S]*>/i.test(msg.text)
+                ? msg.text
+                : null}
             </div>
           </div>
         ))}

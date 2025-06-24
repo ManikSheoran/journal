@@ -27,7 +27,7 @@ function Register() {
       const data = await res.json();
 
       if (res.ok) {
-        navigate("/"); // Redirect to home
+        navigate("/");
       } else {
         setError(data.message || "Registration failed");
       }

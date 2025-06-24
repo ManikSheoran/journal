@@ -1,32 +1,8 @@
 const express = require('express');
 const passport = require('passport');
 const User = require('../models/user');
-
-const crypto = require('crypto');
-const process = require('process');
+const { encrypt, decrypt } = require('../utils/crypto');
 const router = express.Router();
-
-const ENCRYPTION_KEY = process.env.JOURNAL_SECRET_KEY;
-const IV_LENGTH = 16;
-
-function encrypt(text) {
-    if (typeof text !== 'string') text = String(text ?? '');
-    const iv = crypto.randomBytes(IV_LENGTH);
-    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return iv.toString('hex') + ':' + encrypted;
-}
-
-function decrypt(text) {
-    if (!text || typeof text !== 'string' || !text.includes(':')) return text || '';
-    const [ivHex, encrypted] = text.split(':');
-    const iv = Buffer.from(ivHex, 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
-    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
-}
 
 // Get authenticated user's profile
 router.get('/profile', (req, res) => {
@@ -84,14 +60,18 @@ router.post('/journal', async (req, res) => {
         return res.status(401).json({ message: 'Unauthorized access' });
     }
 
-    const { _id, content, mood, todos } = req.body;
+    const { q } = req.query;
+    const _id = q;
+    const {content, mood, todos } = req.body;
 
     if (!_id || !content || typeof mood !== 'number') {
         return res.status(400).json({ message: 'Missing required journal fields' });
     }
 
+    encryptedContent = encrypt(content);
+
     try {
-        req.user.journals.push({ _id, content, mood, todos });
+        req.user.journals.push({ _id, content: encryptedContent, mood, todos });
         await req.user.save();
         res.status(201).json({ message: 'Journal entry added successfully' });
     } catch (err) {
@@ -115,8 +95,10 @@ router.get('/journal', (req, res) => {
     if (!journal) {
         return res.status(404).json({ message: 'Journal entry not found' });
     }
+    
+    const decryptedJournal = { ...journal.toObject(), content: decrypt(journal.content) };
 
-    res.status(200).json({ journal, message: 'Journal entry retrieved successfully' });
+    res.status(200).json({ journal: decryptedJournal, message: 'Journal entry retrieved successfully' });
 });
 
 
@@ -133,7 +115,7 @@ router.put('/journal', async (req, res) => {
     let journal = req.user.journals.find(j => j._id === q);
 
     if (journal) {
-        if (content !== undefined) journal.content = content;
+        if (content !== undefined) journal.content = encrypt(content);
         if (typeof mood === 'number') journal.mood = mood;
         if (Array.isArray(todos)) journal.todos = todos;
     } else {
